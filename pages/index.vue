@@ -149,7 +149,7 @@ function calculateProgress(start: Date, end: Date): number {
             <rect x="20" y="48" width="60" height="6" rx="5" ry="5" fill="white"/>
           </svg>
         </ActionButton>
-        <input v-model="secondsToIncrement" type="text" class="w-40 bg-black/60 text-white text-3xl hover:bg-black/80  pl-4 rounded-md border-none outline-none ring-none duration-300 font-fancy" />
+        <input v-model="secondsToIncrement" type="number" class="w-40 bg-black/60 text-white text-3xl hover:bg-black/80  pl-4 rounded-md border-none outline-none ring-none duration-300 font-fancy" />
       </div>
       <div class="relative z-10 right-4 flex justify-center items-center text-6xl font-fancy px-4 select-none">
         {{ currentTime }}
@@ -157,3 +157,12 @@ function calculateProgress(start: Date, end: Date): number {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+</style>
