@@ -25,7 +25,6 @@ function setActiveTime(newTime: string) {
     }
 
     if (start <= newTimeInt && end >= newTimeInt) {
-      console.log(event)
       event.active = true
       activeHit = true
     } else {
@@ -133,21 +132,24 @@ function calculateTimeLeft(end: Date): string {
   <div class="flex flex-col gap-8 w-full h-full">
     <div class="relative grow flex flex-col justify-around py-4 px-8">
       <div class="absolute top-0 bottom-0 left-0 right-0 bg-black/60 rounded-md" />
-      <div v-for="event in events" :key="event.id" class="relative w-full text-4xl font-fancy flex p-4 duration-1000" :class="event.finished ? 'opacity-50' : 'opacity-100'">
+      <div v-for="event in events" :key="event.id" class="relative w-full text-3xl flex p-2 duration-1000" :class="event.finished ? 'opacity-50' : 'opacity-100'">
         <div 
           v-if="event.active" 
           class="absolute top-0 left-0 h-full flex justify-end bg-orange-500/80 duration-1000 ease-linear rounded-md" 
           :style="{ width: calculateProgress(event.start || new Date(), event.end || new Date()) + '%' }"
         />
         <div v-if="event.active" class="absolute right-0">
-          Time Left: {{ calculateTimeLeft(event.end || new Date()) }}
+          <span>Time Left: </span>
+          <span class="font-fancy">{{ calculateTimeLeft(event.end || new Date()) }}</span>
         </div>
         <div class="relative z-1 flex items-center">
           <div class="absolute left-[-20px] border-t-2 border-white duration-1000" :class="event.finished ? 'right-[-20px] opacity-100' : 'right-full opacity-0'" />
-          <div class="w-[100px]">
+          <div class="w-[80px] font-fancy">
             {{ formatTime(event.start || new Date()) }}
           </div>
-          |
+          <span class="font-fancy">
+            |
+          </span>
           <div class="grow ml-4">
             {{ event.title }}
           </div>
@@ -168,10 +170,15 @@ function calculateTimeLeft(end: Date): string {
             <rect x="20" y="48" width="60" height="6" rx="5" ry="5" fill="white"/>
           </svg>
         </ActionButton>
-        <input v-model="secondsToIncrement" type="number" class="w-40 bg-black/60 text-white text-3xl hover:bg-black/80  pl-4 rounded-md border-none outline-none ring-none duration-300 font-fancy" />
+        <input v-model="secondsToIncrement" type="number" class="w-[100px] bg-black/60 text-white text-3xl hover:bg-black/80  pl-4 rounded-md border-none outline-none ring-none duration-300 font-fancy" />
       </div>
-      <div class="relative z-10 right-4 flex justify-center items-center text-6xl font-fancy px-4 select-none">
-        {{ currentTime }}
+      <div class="relative z-10 right-4 flex justify-center items-center gap-4 px-4 select-none">
+        <span class="text-5xl">
+          Current Time:
+        </span>
+        <span class="w-[240px] font-fancy text-6xl mt-2 flex justify-end">
+          {{ currentTime }}
+        </span>
       </div>
     </div>
   </div>
