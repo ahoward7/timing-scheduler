@@ -1,78 +1,61 @@
 import type { ValentinesEvent } from './interfaces'
 
-const parseTime = (time: string | null): Date | null => {
-  if (!time) return null
-  const [hours, minutes] = time.split(':').map(Number)
-  const date = new Date()
-  date.setHours(hours < 12 ? hours + 12 : hours, minutes, 0, 0) // Convert to PM
-  return date
+const now = new Date()
+const baseHours = now.getHours()
+const baseMinutes = now.getMinutes()
+const baseTime = new Date()
+baseTime.setHours(baseHours, baseMinutes, 0, 0)
+
+const timeOffsets = [
+  0,   // 5:55 → Start time (adjusted to current time)
+  14,  // 6:09 → 6:10 (14 min gap)
+  15,  // 6:24 → 6:25 (15 min gap)
+  10,  // 6:34 → 6:35 (10 min gap)
+  14,  // 6:49 → 6:50 (14 min gap)
+  9,   // 6:59 → 7:00 (9 min gap)
+  10,  // 7:09 → 7:10 (10 min gap)
+  49,  // 7:59 → 8:00 (49 min gap)
+]
+
+const durations = [
+  14,  // 5:55 - 6:09 (14 min)
+  14,  // 6:10 - 6:24 (14 min)
+  9,   // 6:25 - 6:34 (9 min)
+  14,  // 6:35 - 6:49 (14 min)
+  9,   // 6:50 - 6:59 (9 min)
+  9,   // 7:00 - 7:09 (9 min)
+  49,  // 7:10 - 7:59 (49 min)
+  120, // 8:00 - 10:00 (120 min)
+]
+
+const generateTimes = () => {
+  let startTime = new Date(baseTime)
+  return timeOffsets.map((offset, index) => {
+    startTime.setMinutes(startTime.getMinutes() + offset)
+    const start = new Date(startTime)
+    startTime.setMinutes(startTime.getMinutes() + durations[index])
+    const end = new Date(startTime)
+    return { start, end }
+  })
 }
 
+const eventTimes = generateTimes()
+
 const events: ValentinesEvent[] = [
-  {
-    id: 1,
-    start: parseTime('5:55'),
-    end: parseTime('6:09'),
-    title: 'Fill Waters',
-    active: false,
-    finished: false
-  },
-  {
-    id: 2,
-    start: parseTime('6:10'),
-    end: parseTime('6:24'),
-    title: 'Appetizer',
-    active: false,
-    finished: false
-  },
-  {
-    id: 3,
-    start: parseTime('6:25'),
-    end: parseTime('6:34'),
-    title: 'Clear Bowls, Fill Waters',
-    active: false,
-    finished: false
-  },
-  {
-    id: 4,
-    start: parseTime('6:35'),
-    end: parseTime('6:49'),
-    title: 'Serve Entree, Start Live Music',
-    active: false,
-    finished: false
-  },
-  {
-    id: 5,
-    start: parseTime('6:50'),
-    end: parseTime('6:59'),
-    title: 'Fill Waters',
-    active: false,
-    finished: false
-  },
-  {
-    id: 6,
-    start: parseTime('7:00'),
-    end: parseTime('7:09'),
-    title: 'Clear Plates, Set Desserts & Drinks',
-    active: false,
-    finished: false
-  },
-  {
-    id: 7,
-    start: parseTime('7:10'),
-    end: parseTime('7:59'),
-    title: 'Dessert & Drinks Ready',
-    active: false,
-    finished: false
-  },
-  {
-    id: 8,
-    start: parseTime('8:00'),
-    end: parseTime('10:00'),
-    title: 'Clear Dessert Plates, Start Cleaning',
-    active: false,
-    finished: false
-  },
-]
+  { id: 1, title: 'Fill Waters' },
+  { id: 2, title: 'Appetizer' },
+  { id: 3, title: 'Clear Bowls, Fill Waters' },
+  { id: 4, title: 'Serve Entree, Start Live Music' },
+  { id: 5, title: 'Fill Waters' },
+  { id: 6, title: 'Clear Plates, Set Desserts & Drinks' },
+  { id: 7, title: 'Dessert & Drinks Ready' },
+  { id: 8, title: 'Clear Dessert Plates, Start Cleaning' },
+].map((event, index) => ({
+  ...event,
+  start: eventTimes[index].start,
+  end: eventTimes[index].end,
+  active: false,
+  finished: false
+}))
 
 export default events
