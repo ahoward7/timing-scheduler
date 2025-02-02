@@ -25,6 +25,7 @@ function setActiveTime(newTime: string) {
     }
 
     if (start <= newTimeInt && end >= newTimeInt) {
+      console.log(event)
       event.active = true
       activeHit = true
     } else {
@@ -81,10 +82,10 @@ function formatTime(date: Date): string {
 }
 
 function formatTimeWithSeconds(date: Date, isEnd = false): string {
-  const hours = (date.getHours() % 12) || 12 // Convert to 12-hour format
+  const hours = (date.getHours() % 12) || 12
   const minutes = date.getMinutes().toString().padStart(2, '0')
   const seconds = isEnd ? '59' : date.getSeconds().toString().padStart(2, '0')
-  return `${hours}:${minutes}:${seconds}`
+  return `${hours === 12 ? 0 : hours}:${minutes}:${seconds}`
 }
 
 function adjustTime(date: Date, offset: number): Date {
@@ -111,6 +112,21 @@ function calculateProgress(start: Date, end: Date): number {
 
   return (elapsedTime / totalDuration) * 100
 }
+
+function calculateTimeLeft(end: Date): string {
+  const endTime = (end.getHours() % 12) * 3600000 + end.getMinutes() * 60000
+  const now = new Date()
+  const currentTime = (now.getHours() % 12) * 3600000 + now.getMinutes() * 60000 + now.getSeconds() * 1000
+
+  const timeLeft = endTime - currentTime + 60000
+
+  const hours = Math.floor(timeLeft / 3600000)
+  const minutes = Math.floor((timeLeft % 3600000) / 60000)
+  const seconds = Math.floor((timeLeft % 60000) / 1000)
+
+  const hoursStr = hours > 0 ? `${hours}:` : ''
+  return `${hoursStr}${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+}
 </script>
 
 <template>
@@ -120,9 +136,12 @@ function calculateProgress(start: Date, end: Date): number {
       <div v-for="event in events" :key="event.id" class="relative w-full text-4xl font-fancy flex p-4 duration-1000" :class="event.finished ? 'opacity-50' : 'opacity-100'">
         <div 
           v-if="event.active" 
-          class="absolute top-0 left-0 h-full bg-orange-500/80 duration-1000 ease-linear rounded-md" 
+          class="absolute top-0 left-0 h-full flex justify-end bg-orange-500/80 duration-1000 ease-linear rounded-md" 
           :style="{ width: calculateProgress(event.start || new Date(), event.end || new Date()) + '%' }"
         />
+        <div v-if="event.active" class="absolute right-0">
+          Time Left: {{ calculateTimeLeft(event.end || new Date()) }}
+        </div>
         <div class="relative z-1 flex items-center">
           <div class="absolute left-[-20px] border-t-2 border-white duration-1000" :class="event.finished ? 'right-[-20px] opacity-100' : 'right-full opacity-0'" />
           <div class="w-[100px]">
